@@ -8,14 +8,16 @@ class GameLogic # The game logic
 	end
 
 	def play # Plays one game of Master Codebreaker
-		puts "Try to guess the computer player's secret code in 12 turns!\n"
+		puts "Try to guess the computer player's secret code in 12 turns!"
+		puts "A black key peg means that one of your guesses is correct both in color and placement."
+		puts "A white key peg means that one of your guesses is correct in color but not in placement.\n"
 		while 1
 			@turn += 1
 			player_turn
 			if winner?
 				puts "You are victorious in #{@turn} turn(s)!\n"
 				@player.wins += 1
-				if @player.best > @turn
+				if @player.best > @turn || @player.best == -1
 					@player.best = @turn
 				end
 				return 
@@ -28,6 +30,8 @@ class GameLogic # The game logic
 		end
 	end
 
+	private
+
 	def generate_code # Generates and returns the computer player's secret code
 		color = ["G", "B", "R", "P", "Y", "O"]
 		4.times do
@@ -36,7 +40,26 @@ class GameLogic # The game logic
 	end
 
 	def player_turn
-		@board.fill_key_row(@turn, "B", "B", "B", "B")
+		begin
+			puts "#{player.name}, guess the secret code.  The colors are red, green, blue, yellow, purple, and orange."
+			puts "Colors may be used more than once."
+			puts "Peg 1: "
+			peg1_guess = gets.chomp.upcase
+			puts "Peg 2: "
+			peg2_guess = gets.chomp.upcase
+			puts "Peg 3: "
+			peg3_guess = gets.chomp.upcase
+			puts "Peg 4: "
+			peg4_guess = gets.chomp.upcase
+			raise ArgumentError if guess_error?(peg1_guess) || guess_error?(peg2_guess) || guess_error?(peg3_guess) || guess_error?(peg4_guess)
+		rescue
+			puts "You must enter one of the six listed colors."
+			retry
+		end
+	end
+
+	def guess_error?(guess)
+		return !(guess == "RED" || guess == "BLUE" || guess == "GREEN" || guess == "ORANGE" || guess == "YELLOW" || guess == "PURPLE" || guess == "R" || guess == "B" || guess == "G" || guess == "O" || guess == "Y" || guess == "P")
 	end
 
 	def winner?
