@@ -2,60 +2,93 @@ class GameLogic # The game logic
 	def initialize(player)
 		@player = player
 		@board = Board.new
-		@secret_code = generate_code
+		@turn = 0
+		@secret_code = Array.new
+		generate_code
 	end
 
 	def play # Plays one game of Master Codebreaker
-
+		puts "Try to guess the computer player's secret code in 12 turns!\n"
+		while 1
+			@turn += 1
+			player_turn
+			if winner?
+				puts "You are victorious in #{@turn} turn(s)!\n"
+				@player.wins += 1
+				if @player.best > @turn
+					@player.best = @turn
+				end
+				return 
+			end
+			if @turn >= 12
+				puts "You have been defeated!\n"
+				@player.losses += 1
+				return
+			end
+		end
 	end
 
 	def generate_code # Generates and returns the computer player's secret code
+		color = ["G", "B", "R", "P", "Y", "O"]
+		4.times do
+			@secret_code.push(color[Random.rand(0..5)])
+		end
+	end
 
+	def player_turn
+		@board.fill_key_row(@turn, "B", "B", "B", "B")
+	end
+
+	def winner?
+		if @board.get_key_peg(@turn, 1) == "B" && @board.get_key_peg(@turn, 1) == @board.get_key_peg(@turn, 2) && @board.get_key_peg(@turn, 2) == @board.get_key_peg(@turn, 3) && @board.get_key_peg(@turn, 3) == @board.get_key_peg(@turn, 4)
+			return true
+		else
+			return false
+		end
 	end
 
 end
 
 class Board # Manages the creation and manipulation of the game board
+
 	def initialize
 		@row = Array.new(12)
 		(0..11).each do |index|
 			@row[index] = Hash.new
-			@row[index]["code peg"] = []
-			@row[index]["key peg"] = []
+			@row[index][:code_peg] = []
+			@row[index][:key_peg] = []
 		end
-		@last_index_filled = 0
 	end
 
 	# Fills the code pegs of one row
 	def fill_code_row(row, peg1, peg2, peg3, peg4)
-		@row[row-1]["code peg"] = [peg1, peg2, peg3, peg4]
-		@last_index_filled = row-1
+		@row[row-1][:code_peg] = [peg1, peg2, peg3, peg4]
 	end
 
 	# Fills the key pegs of one row
 	def fill_key_row(row, peg1="E", peg2="E", peg3="E", peg4="E")
-		@row[row-1]["key peg"] = [peg1, peg2, peg3, peg4]
+		@row[row-1][:key_peg] = [peg1, peg2, peg3, peg4]
 	end
 
 	# Returns the value of a code peg from a given row
 	def get_code_peg(row, peg_num)
-		@row[row-1]["code peg"][peg_num-1]
+		@row[row-1][:code_peg][peg_num-1]
 	end
 
 	# Returns the value of a key peg from a given row
 	def get_key_peg(row, peg_num)
-		@row[row-1]["key peg"][peg_num-1]
+		@row[row-1][:key_peg][peg_num-1]
 	end
 
-	def print_board #Prints the current game board (filled portion only)
-		(0..last_index_filled).each do |row_index|
+	def print_board(turn) #Prints the current game board (filled portion only)
+		(0...turn).each do |row_index|
 			print "Row #{row_index+1}: Code Pegs: "
 			(0..3).each do |code_index|
-				print "#{@row[row_index]['code peg'][code_index]} "
+				print "#{@row[row_index][:code_peg][code_index]} "
 			end
 			print "Key Pegs: "
 			(0..3).each do |key_index|
-				print "#{@row[row_index]['key peg'][key_index]} "
+				print "#{@row[row_index][:key_peg][key_index]} "
 			end
 			puts
 		end
@@ -65,8 +98,6 @@ end
 Player = Struct.new(:name, :wins, :losses, :best)
 
 Code = Struct.new(:code1, :code2, :code3, :code4)
-
-color = ["green", "blue", "red", "purple", "yellow", "orange"]
 
 begin
 	puts "Please enter your name: "
@@ -80,8 +111,9 @@ end
 play_again = true
 while play_again
 	puts "\nLet's play!\n"
-#	game = GameLogic.new(player)
-#	game.play
+ 	game = GameLogic.new(player)
+	game.play
+	
 
 	puts "\n#{player.name}, you have won #{player.wins} game(s) and lost #{player.losses} game(s)."
 	puts "Your best scores is #{player.best} turn(s)." if player.best != -1
