@@ -9,8 +9,9 @@ class GameLogic # The game logic
 
 	def play # Plays one game of Master Codebreaker
 		puts "Try to guess the computer player's secret code in 12 turns!"
-		puts "A black key peg means that one of your guesses is correct both in color and placement."
-		puts "A white key peg means that one of your guesses is correct in color but not in placement.\n"
+		puts "A black key peg means that one of your guesses is correct"
+		puts "both in color and placement. A white key peg means that"
+		puts "one of your guesses is correct in color but not in placement.\n"
 		while 1
 			@turn += 1
 			player_turn
@@ -42,7 +43,7 @@ class GameLogic # The game logic
 
 	def player_turn # Executes one turn
 		begin
-			puts "#{player.name}, guess the secret code.  The colors are red, green, blue, yellow, purple, and orange."
+			puts "#{@player.name}, guess the secret code. The colors are red, green, blue, yellow, purple, and orange."
 			puts "Colors may be used more than once."
 			puts "Peg 1: "
 			peg1_guess = gets.chomp.upcase
@@ -72,80 +73,80 @@ class GameLogic # The game logic
 	def match(peg1, peg2, peg3, peg4)
 		black_count = 0
 		white_count = 0
-		peg1_match == false
-		peg2_match == false
-		peg3_match == false
-		peg4_match == false
-		code1_match == false
-		code2_match == false
-		code3_match == false
-		code4_match == false
+		peg1_match = false
+		peg2_match = false
+		peg3_match = false
+		peg4_match = false
+		code1_match = false
+		code2_match = false
+		code3_match = false
+		code4_match = false
 		if peg1[0] == @secret_code[0] 
 			black_count += 1
-			peg1_match == true
-			code1_match == true
+			peg1_match = true
+			code1_match = true
 		end
 		if peg2[0] == @secret_code[1]
 			black_count += 1
-			peg2_match == true
-			code2_match == true
+			peg2_match = true
+			code2_match = true
 		end
 		if peg3[0] == @secret_code[2]
 			black_count += 1
-			peg3_match == true
-			code3_match == true
+			peg3_match = true
+			code3_match = true
 		end
 		if peg4[0] == @secret_code[3]
 			black_count += 1
-			peg4_match == true
-			code4_match == true
+			peg4_match = true
+			code4_match = true
 		end
 		if !peg1_match
 			if !code2_match && peg1[0] == @secret_code[1]
 				white_count += 1
-				code2_match == true
+				code2_match = true
 			elsif !code3_match && peg1[0] == @secret_code[2]
 				white_count += 1
-				code3_match == true
+				code3_match = true
 			elsif !code4_match && peg1[0] == @secret_code[3]
 				white_count += 1
-				code4_match == true
+				code4_match = true
 			end
 		end
 		if !peg2_match
 			if !code1_match && peg2[0] == @secret_code[0]
 				white_count += 1
-				code1_match == true
+				code1_match = true
 			elsif !code3_match && peg2[0] == @secret_code[2]
 				white_count += 1
-				code3_match == true
+				code3_match = true
 			elsif !code4_match && peg2[0] == @secret_code[3]
 				white_count += 1
-				code4_match == true
+				code4_match = true
 			end
 		end
 		if !peg3_match
 			if !code1_match && peg3[0] == @secret_code[0]
 				white_count += 1
-				code1_match == true
+				code1_match = true
 			elsif !code2_match && peg3[0] == @secret_code[1]
 				white_count += 1
-				code2_match == true
+				code2_match = true
 			elsif !code4_match && peg3[0] == @secret_code[3]
 				white_count += 1
-				code4_match == true
+				code4_match = true
 			end
 		end		
 		if !peg4_match
 			if !code1_match && peg4[0] == @secret_code[0]
 				white_count += 1
-				code1_match == true
+				code1_match = true
 			elsif !code2_match && peg4[0] == @secret_code[1]
 				white_count += 1
-				code2_match == true
+				code2_match = true
 			elsif !code3_match && peg4[0] == @secret_code[2]
 				white_count += 1
-				code3_match == true
+				code3_match = true
 			end
 		end
 		@board.fill_key_row(@turn, black_count, white_count)
@@ -236,7 +237,7 @@ end
 
 play_again = true
 while play_again
-	puts "\nLet's play!\n"
+	puts "Let's play!"
  	game = GameLogic.new(player)
 	game.play
 
