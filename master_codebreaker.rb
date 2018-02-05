@@ -14,6 +14,7 @@ class GameLogic # The game logic
 		while 1
 			@turn += 1
 			player_turn
+			@board.print_board(@turn)
 			if winner?
 				puts "You are victorious in #{@turn} turn(s)!\n"
 				@player.wins += 1
@@ -39,7 +40,7 @@ class GameLogic # The game logic
 		end
 	end
 
-	def player_turn
+	def player_turn # Executes one turn
 		begin
 			puts "#{player.name}, guess the secret code.  The colors are red, green, blue, yellow, purple, and orange."
 			puts "Colors may be used more than once."
@@ -56,13 +57,101 @@ class GameLogic # The game logic
 			puts "You must enter one of the six listed colors."
 			retry
 		end
+
+		@board.fill_code_row(@turn, peg1_guess, peg2_guess, peg3_guess, peg4_guess)
+		match(peg1_guess, peg2_guess, peg3_guess, peg4_guess)
+
 	end
 
-	def guess_error?(guess)
+	def guess_error?(guess) # Returns true if the user input an invalid guess
 		return !(guess == "RED" || guess == "BLUE" || guess == "GREEN" || guess == "ORANGE" || guess == "YELLOW" || guess == "PURPLE" || guess == "R" || guess == "B" || guess == "G" || guess == "O" || guess == "Y" || guess == "P")
 	end
 
-	def winner?
+	# Determines if any of the player's guesses match the 
+	# secret code.  Assigns key pegs as appropriate.
+	def match(peg1, peg2, peg3, peg4)
+		black_count = 0
+		white_count = 0
+		peg1_match == false
+		peg2_match == false
+		peg3_match == false
+		peg4_match == false
+		code1_match == false
+		code2_match == false
+		code3_match == false
+		code4_match == false
+		if peg1[0] == @secret_code[0] 
+			black_count += 1
+			peg1_match == true
+			code1_match == true
+		end
+		if peg2[0] == @secret_code[1]
+			black_count += 1
+			peg2_match == true
+			code2_match == true
+		end
+		if peg3[0] == @secret_code[2]
+			black_count += 1
+			peg3_match == true
+			code3_match == true
+		end
+		if peg4[0] == @secret_code[3]
+			black_count += 1
+			peg4_match == true
+			code4_match == true
+		end
+		if !peg1_match
+			if !code2_match && peg1[0] == @secret_code[1]
+				white_count += 1
+				code2_match == true
+			elsif !code3_match && peg1[0] == @secret_code[2]
+				white_count += 1
+				code3_match == true
+			elsif !code4_match && peg1[0] == @secret_code[3]
+				white_count += 1
+				code4_match == true
+			end
+		end
+		if !peg2_match
+			if !code1_match && peg2[0] == @secret_code[0]
+				white_count += 1
+				code1_match == true
+			elsif !code3_match && peg2[0] == @secret_code[2]
+				white_count += 1
+				code3_match == true
+			elsif !code4_match && peg2[0] == @secret_code[3]
+				white_count += 1
+				code4_match == true
+			end
+		end
+		if !peg3_match
+			if !code1_match && peg3[0] == @secret_code[0]
+				white_count += 1
+				code1_match == true
+			elsif !code2_match && peg3[0] == @secret_code[1]
+				white_count += 1
+				code2_match == true
+			elsif !code4_match && peg3[0] == @secret_code[3]
+				white_count += 1
+				code4_match == true
+			end
+		end		
+		if !peg4_match
+			if !code1_match && peg4[0] == @secret_code[0]
+				white_count += 1
+				code1_match == true
+			elsif !code2_match && peg4[0] == @secret_code[1]
+				white_count += 1
+				code2_match == true
+			elsif !code3_match && peg4[0] == @secret_code[2]
+				white_count += 1
+				code3_match == true
+			end
+		end
+		@board.fill_key_row(@turn, black_count, white_count)
+	end
+
+	def winner? # Returns true if the player has won the game
 		if @board.get_key_peg(@turn, 1) == "B" && @board.get_key_peg(@turn, 1) == @board.get_key_peg(@turn, 2) && @board.get_key_peg(@turn, 2) == @board.get_key_peg(@turn, 3) && @board.get_key_peg(@turn, 3) == @board.get_key_peg(@turn, 4)
 			return true
 		else
@@ -89,8 +178,22 @@ class Board # Manages the creation and manipulation of the game board
 	end
 
 	# Fills the key pegs of one row
-	def fill_key_row(row, peg1="E", peg2="E", peg3="E", peg4="E")
-		@row[row-1][:key_peg] = [peg1, peg2, peg3, peg4]
+	def fill_key_row(row, black_pegs, white_pegs)
+		black_pegs.times do
+			self.fill_key_peg(row, "B")
+		end
+		white_pegs.times do
+			self.fill_key_peg(row, "W")
+		end
+		empty_pegs = 4 - black_pegs - white_pegs
+		empty_pegs.times do
+			self.fill_key_peg(row, "E")
+		end
+	end
+
+	# Assign a key peg (black, white, or empty) to the next empty slot
+	def fill_key_peg(row, value)
+		@row[row-1][:key_peg].push(value)
 	end
 
 	# Returns the value of a code peg from a given row
@@ -136,7 +239,6 @@ while play_again
 	puts "\nLet's play!\n"
  	game = GameLogic.new(player)
 	game.play
-	
 
 	puts "\n#{player.name}, you have won #{player.wins} game(s) and lost #{player.losses} game(s)."
 	puts "Your best scores is #{player.best} turn(s)." if player.best != -1
