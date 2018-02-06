@@ -11,11 +11,17 @@ class GameLogic # The game logic
 		puts "Try to guess the computer player's secret code in 12 turns!"
 		puts "A black key peg means that one of your guesses is correct"
 		puts "both in color and placement. A white key peg means that"
-		puts "one of your guesses is correct in color but not in placement.\n"
+		puts "one of your guesses is correct in color but not in placement."
+		puts "The position of the key pegs do not necessarily match"
+		puts "the code pegs to which they refer."
+		puts
+
 		while 1
 			@turn += 1
 			player_turn
+			puts
 			@board.print_board(@turn)
+			puts
 			if winner?
 				puts "You are victorious in #{@turn} turn(s)!\n"
 				@player.wins += 1
@@ -43,15 +49,16 @@ class GameLogic # The game logic
 
 	def player_turn # Executes one turn
 		begin
-			puts "#{@player.name}, guess the secret code. The colors are red, green, blue, yellow, purple, and orange."
-			puts "Colors may be used more than once."
-			puts "Peg 1: "
+			puts "Guess the secret code. The colors are red, green, blue, yellow,"
+			puts "purple, and orange. Colors may be used more than once."
+			puts
+			print "Peg 1: "
 			peg1_guess = gets.chomp.upcase
-			puts "Peg 2: "
+			print "Peg 2: "
 			peg2_guess = gets.chomp.upcase
-			puts "Peg 3: "
+			print "Peg 3: "
 			peg3_guess = gets.chomp.upcase
-			puts "Peg 4: "
+			print "Peg 4: "
 			peg4_guess = gets.chomp.upcase
 			raise ArgumentError if guess_error?(peg1_guess) || guess_error?(peg2_guess) || guess_error?(peg3_guess) || guess_error?(peg4_guess)
 		rescue
@@ -59,7 +66,7 @@ class GameLogic # The game logic
 			retry
 		end
 
-		@board.fill_code_row(@turn, peg1_guess, peg2_guess, peg3_guess, peg4_guess)
+		@board.fill_code_row(@turn, peg1_guess[0], peg2_guess[0], peg3_guess[0], peg4_guess[0])
 		match(peg1_guess, peg2_guess, peg3_guess, peg4_guess)
 
 	end
@@ -255,5 +262,5 @@ while play_again
 end
 
 puts "\nThanks for playing Master Codebreaker, #{player.name}!"
-puts "You won #{player.wins} games and lost #{player.losses} games."
+puts "You won #{player.wins} games and lost #{player.losses} game(s)."
 puts "Your best score was #{player.best} turn(s)." if player.best != -1
